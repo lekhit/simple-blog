@@ -1,15 +1,26 @@
 import Head from 'next/head'
 import Image from 'next/image'
-
+import Link from 'next/link'
 
 import Blog from '../components/Blog'
 import { Inter } from '@next/font/google'
+import { useState,useEffect } from 'react'
 
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
 })
 export default function Home() {
+  const [posts,setPosts]=useState([]);
+  const getData=()=>{
+    fetch('api/get_posts')
+    .then(response => response.json())
+    .then(data => setPosts(data))
+    .catch(err => console.error(err));
+  }
+  useEffect(()=>{
+   getData();
+  },[])
   return (
     <>
       <Head>
@@ -20,12 +31,23 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={`font-inter`}>
-       
-       <div className=''></div>
+      <Link href='/add'>
+      <button class="fixed right-10 bottom-10 bg-[#E9E9E9] hover:bg-gray-400 text-white font-bold py-2 px-4 rounded-2xl">
+  <Image width={50} height={60} className=""  alt='home' src={'/add_new.svg'}></Image>
+</button>
+</Link>
+       <div className='flex items-center justify-center'></div>
         <div className='m-24  grid grid-cols-3 gap-4'>
-<Blog title={'first blog'}></Blog>
-<Blog title={'second blog'}></Blog>
+{posts.map((data,id)=>{
+  return (
+  <Link key={id} href={{ pathname: '/post', query: { id: data._id } }}>
+  <Blog  title={data.title}></Blog>
+  </Link>);
+})}
+
+
         </div>
+        
       </main>
     </>
   )
